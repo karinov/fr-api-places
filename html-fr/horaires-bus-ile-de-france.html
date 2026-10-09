@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horaires des bus en Île-de-France — RATP, Île-de-France Mobilités</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#173B5E;
+    --navy-deep:#0F2A44;
+    --red:#C8102E;
+    --blue-tint:#F3F7FD;
+    --red-tint:#FDF3F4;
+    --border:#E1E6ED;
+    --border-strong:#B7C3D2;
+    --ink:#173B5E;
+    --muted:#5B6472;
+    --paper:#FFFFFF;
+    --z-paris:#173B5E;
+    --z-petite:#7FA1C6;
+    --z-grande:#DCE8F7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{background:#DCE4EE;display:flex;align-items:center;justify-content:center;overflow:hidden;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;}
+  .icon{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform:translate(-50%,-50%) scale(1);transform-origin:center center;background:var(--paper);display:flex;flex-direction:column;padding:22px 28px 16px;box-shadow:0 14px 50px rgba(23,59,94,.22);}
+
+  /* topbar */
+  .topbar{flex-shrink:0;display:flex;align-items:center;gap:24px;padding-bottom:11px;border-bottom:2px solid var(--navy);}
+  .brand .kicker{font-family:'Space Grotesk',sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--red);font-weight:600;}
+  .brand h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;line-height:1.05;color:var(--navy);margin-top:4px;letter-spacing:-.01em;}
+  .brand h1 b{color:var(--red);}
+  .brand p{font-size:12.5px;color:var(--muted);margin-top:4px;}
+  .badges{margin-left:auto;display:flex;gap:9px;}
+  .badge{display:flex;align-items:center;gap:7px;border:1px solid var(--border);background:var(--blue-tint);padding:8px 12px;}
+  .badge .icon{color:var(--navy);}
+  .badge.red .icon{color:var(--red);}
+  .badge span{font-size:11px;font-weight:600;color:var(--ink);white-space:nowrap;}
+
+  /* board */
+  .board{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;padding-top:12px;}
+  .main{display:flex;gap:12px;flex:1;min-height:0;}
+  .brow{display:flex;gap:12px;flex:0 0 152px;min-height:0;}
+  .col{width:322px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;min-height:0;}
+  .col .panel{flex:1;}
+
+  /* panels */
+  .panel{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;border:1px solid var(--border);background:#fff;}
+  .panel-head{display:flex;align-items:center;gap:8px;padding:7px 11px;background:var(--navy);color:#fff;flex-shrink:0;}
+  .panel-head .icon{color:#fff;}
+  .panel-head h2{font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;}
+  .panel.gold .panel-head{background:var(--navy-deep);}
+  .panel.accent{border-color:#F2CBD1;background:var(--red-tint);}
+  .panel.accent .panel-head{background:var(--red);}
+  .panel-body{padding:10px 11px;flex:1;min-height:0;display:flex;flex-direction:column;}
+  .lead{font-size:11px;color:var(--muted);line-height:1.35;margin-bottom:7px;}
+  .li{display:flex;align-items:flex-start;gap:8px;padding:4px 0;border-bottom:1px dashed var(--border);}
+  .li:last-child{border-bottom:0;}
+  .li .icon{width:15px;height:15px;color:var(--navy);margin-top:1px;}
+  .panel.accent .li .icon{color:var(--red);}
+  .li span{font-size:11px;line-height:1.28;color:var(--ink);}
+  .note{display:flex;align-items:center;gap:7px;margin-top:auto;padding:5px 8px;border:1px dashed var(--border-strong);background:var(--blue-tint);font-size:9.5px;font-style:italic;color:var(--muted);}
+  .note .icon{width:13px;height:13px;color:var(--navy);}
+  .panel.accent .note{border-color:#E8B7BF;background:#fff;color:var(--red);}
+  .panel.accent .note .icon{color:var(--red);}
+
+  /* zone rows */
+  .zone{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px dashed var(--border);}
+  .zone .dot{width:14px;height:14px;border:1px solid var(--navy);flex-shrink:0;}
+  .zone .dot.paris{background:var(--z-paris);}
+  .zone .dot.petite{background:var(--z-petite);}
+  .zone .dot.grande{background:var(--z-grande);}
+  .zone .zt{font-size:11.5px;font-weight:600;color:var(--ink);}
+  .zone .zs{font-size:9.5px;color:var(--muted);margin-left:auto;}
+
+  /* operator chain */
+  .chain{display:flex;align-items:center;gap:3px;margin:2px 0 6px;flex-wrap:wrap;}
+  .chain .cnode{font-family:'Space Grotesk',sans-serif;font-size:7.5px;font-weight:600;color:var(--navy);background:var(--blue-tint);border:1px solid var(--border);padding:3px 5px;letter-spacing:.02em;}
+  .chain .carrow{width:9px;height:9px;color:var(--border-strong);flex-shrink:0;}
+
+  /* search bar */
+  .searchbar{display:flex;align-items:center;gap:8px;margin-top:6px;border:1px solid var(--border-strong);background:#fff;padding:7px 10px;}
+  .searchbar .icon{width:15px;height:15px;color:var(--navy);}
+  .searchbar span{font-size:10.5px;color:var(--muted);}
+
+  /* map */
+  .mapwrap{flex:1;min-width:0;display:flex;min-height:0;}
+  .map-card{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;border:1px solid var(--border);background:linear-gradient(180deg,#F7FAFF,#FFFFFF);}
+  .map-head{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--navy-deep);color:#fff;flex-shrink:0;}
+  .map-head .icon{color:#8FB0D6;}
+  .map-head h2{font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;}
+  .map-head .pill{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:10px;color:#AEC6E2;}
+  .map-body{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:4px 8px;}
+  .idf-map{width:100%;height:100%;}
+  .dept{stroke:#173B5E;stroke-width:0.9;stroke-linejoin:round;}
+  .dept.d-paris{fill:var(--z-paris);}
+  .dept.d-petite{fill:var(--z-petite);}
+  .dept.d-grande{fill:var(--z-grande);}
+  .zlabel{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;fill:var(--navy);text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round;letter-spacing:.02em;}
+  .callout{stroke:var(--navy);stroke-width:1;stroke-dasharray:2 2;}
+  .legend{display:flex;align-items:center;justify-content:center;gap:18px;padding:7px;border-top:1px solid var(--border);flex-shrink:0;font-size:10.5px;color:var(--muted);}
+  .legend .lg{font-weight:500;color:var(--muted);display:flex;align-items:center;gap:6px;}
+  .sw{width:12px;height:12px;border:1px solid var(--navy);display:inline-block;}
+  .sw.paris{background:var(--z-paris);} .sw.petite{background:var(--z-petite);} .sw.grande{background:var(--z-grande);}
+  .legend .cap{margin-left:auto;font-size:9.5px;color:#8A94A3;font-style:italic;}
+
+  /* route diagram */
+  .routebox{border:1px solid var(--border);background:var(--blue-tint);padding:8px 10px 6px;margin-bottom:8px;}
+  .route-svg{width:100%;height:42px;display:block;}
+  .rl-line{stroke:var(--navy);stroke-width:2;}
+  .rl-dot{fill:#fff;stroke:var(--navy);stroke-width:2;}
+  .rl-term{fill:var(--red);stroke:#fff;stroke-width:1.5;}
+  .rl-arrow{fill:none;stroke:var(--red);stroke-width:2;}
+  .rlabels{display:flex;justify-content:space-between;margin-top:1px;}
+  .rlabels span{font-size:9px;color:var(--muted);}
+  .rlabels span b{color:var(--navy);}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{display:flex;align-items:center;gap:5px;border:1px solid var(--border);background:#fff;padding:5px 8px;}
+  .chip .icon{width:13px;height:13px;color:var(--navy);}
+  .chip span{font-size:10px;font-weight:500;color:var(--ink);white-space:nowrap;}
+
+  /* flow */
+  .flow{display:flex;align-items:center;justify-content:center;flex:1;min-height:0;gap:1px;}
+  .fstep{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;text-align:center;}
+  .fstep .ic{width:34px;height:34px;border:1px solid var(--border);background:var(--blue-tint);display:flex;align-items:center;justify-content:center;color:var(--navy);}
+  .fstep .ic .icon{width:17px;height:17px;}
+  .fstep .t{font-family:'Space Grotesk',sans-serif;font-size:9px;font-weight:500;color:var(--ink);text-transform:uppercase;line-height:1.15;}
+  .fstep .t b{color:var(--red);}
+  .farrow{width:14px;height:14px;color:var(--border-strong);flex-shrink:0;}
+
+  /* info grid */
+  .igrid{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:7px;flex:1;min-height:0;}
+  .info-item{display:flex;align-items:center;gap:7px;border:1px solid var(--border);background:#fff;padding:7px 8px;}
+  .info-item .icon{width:14px;height:14px;color:var(--navy);}
+  .info-item span{font-size:10px;font-weight:500;color:var(--ink);line-height:1.2;}
+
+  .foot{margin-top:10px;padding-top:7px;border-top:1px solid var(--border);text-align:center;font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<svg style="display:none" aria-hidden="true">
+<defs>
+  <symbol id="i-bus" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="11" rx="1"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="7.5" cy="18.5" r="1.5"/><circle cx="16.5" cy="18.5" r="1.5"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><line x1="9" y1="4.3" x2="9" y2="18.3"/><line x1="15" y1="6" x2="15" y2="20"/></symbol>
+  <symbol id="i-ticket" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="1"/><line x1="9" y1="7" x2="9" y2="17" stroke-dasharray="2 2"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="1"/><line x1="4" y1="9" x2="20" y2="9"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="8" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="12" x2="12" y2="7"/><line x1="12" y1="12" x2="16" y2="14"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><path d="M12 21s7-7.2 7-12a7 7 0 1 0-14 0c0 4.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/></symbol>
+  <symbol id="i-route" viewBox="0 0 24 24"><circle cx="4.5" cy="18" r="1.4" fill="currentColor" stroke="none"/><circle cx="19.5" cy="6" r="1.4" fill="currentColor" stroke="none"/><path d="M4.5 18C9 10 8 8 12 8s3 6 7.5-2" stroke-dasharray="2.4 2.4"/></symbol>
+  <symbol id="i-transfer" viewBox="0 0 24 24"><path d="M4 8h14"/><path d="M15 4l3 4-3 4"/><path d="M20 16H6"/><path d="M9 12l-3 4 3 4"/></symbol>
+  <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M5.5 20c0-4 3-6 6.5-6s6.5 2 6.5 6"/></symbol>
+  <symbol id="i-senior" viewBox="0 0 24 24"><circle cx="12" cy="7" r="3"/><path d="M5.5 20c0-4 3-6 6.5-6s6.5 2 6.5 6"/><line x1="17.5" y1="14" x2="19.5" y2="20"/></symbol>
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M12 4L2 8l10 4 10-4z"/><path d="M6 10.5V15c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.2-4.4-7.2-9.6C4.8 7 6.9 5 9.4 5c1.4 0 2.4.8 2.9 1.6.5-.8 1.5-1.6 2.9-1.6 2.5 0 4.6 2 4.6 5.4C19.8 15.6 12 20 12 20z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><line x1="4" y1="12" x2="19" y2="12"/><path d="M14 7l5 5-5 5"/></symbol>
+  <symbol id="i-euro" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.2 9.2A4 4 0 1 0 15 14.8"/><line x1="8.5" y1="11" x2="13" y2="11"/><line x1="8.5" y1="13" x2="13" y2="13"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><line x1="15" y1="15" x2="20.5" y2="20.5"/></symbol>
+  <symbol id="i-train" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="13" rx="2.5"/><path d="M5 9.5h14"/><circle cx="9" cy="12.8" r="1.1" fill="currentColor" stroke="none"/><circle cx="15" cy="12.8" r="1.1" fill="currentColor" stroke="none"/><path d="M8.5 16.5L6 21M15.5 16.5L18 21M7 21h10"/></symbol>
+  <symbol id="i-metro" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 16V8.5l4 5 4-5V16"/></symbol>
+  <symbol id="i-rer" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 15V9h3.6a2.2 2.2 0 0 1 0 4.4H8"/><path d="M12.5 13.4L16 15"/></symbol>
+  <symbol id="i-tram" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="12" rx="2"/><line x1="5" y1="10" x2="19" y2="10"/><line x1="12" y1="4" x2="12" y2="1.6"/><line x1="8" y1="20" x2="10" y2="16.5"/><line x1="16" y1="20" x2="14" y2="16.5"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><line x1="6" y1="3" x2="6" y2="21"/><path d="M6 4h12l-3 4 3 4H6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><line x1="12" y1="10" x2="12" y2="14.5"/><circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-wheelchair" viewBox="0 0 24 24"><circle cx="11" cy="4.5" r="2"/><path d="M11 6.5V13h5l2 6"/><path d="M13.5 16A4.5 4.5 0 1 1 8 13"/></symbol>
+  <symbol id="i-network" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><line x1="12" y1="7" x2="5.8" y2="16.2"/><line x1="12" y1="7" x2="18.2" y2="16.2"/><line x1="7" y1="18" x2="17" y2="18"/></symbol>
+</defs>
+</svg>
+
+<div class="stage">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="kicker">RATP · Île-de-France Mobilités · Réseau de bus</div>
+      <h1>Horaires des bus en <b>Île-de-France</b></h1>
+      <p>RATP, Île-de-France Mobilités, lignes, horaires et tarifs</p>
+    </div>
+    <div class="badges">
+      <div class="badge"><svg class="icon"><use href="#i-bus"/></svg><span>Réseau de bus</span></div>
+      <div class="badge red"><svg class="icon"><use href="#i-clock"/></svg><span>Horaires</span></div>
+      <div class="badge"><svg class="icon"><use href="#i-ticket"/></svg><span>Tarifs &amp; titres</span></div>
+    </div>
+  </header>
+
+  <div class="board">
+
+    <div class="main">
+
+      <!-- LEFT COLUMN -->
+      <div class="col">
+
+        <section class="panel">
+          <div class="panel-head"><svg class="icon"><use href="#i-bus"/></svg><h2>1 · Réseau de bus</h2></div>
+          <div class="panel-body">
+            <p class="lead">Le réseau de bus couvre toute l’Île-de-France.</p>
+            <div class="zone"><i class="dot paris"></i><span class="zt">Paris</span><span class="zs">centre</span></div>
+            <div class="zone"><i class="dot petite"></i><span class="zt">Petite couronne</span><span class="zs">proche banlieue</span></div>
+            <div class="zone"><i class="dot grande"></i><span class="zt">Grande couronne</span><span class="zs">banlieue élargie</span></div>
+            <div class="li"><svg class="icon"><use href="#i-bus"/></svg><span>Services urbains et suburbains</span></div>
+            <div class="li"><svg class="icon"><use href="#i-route"/></svg><span>Liaisons villes · banlieues · pôles de transport</span></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><svg class="icon"><use href="#i-network"/></svg><h2>2 · Île-de-France Mobilités</h2></div>
+          <div class="panel-body">
+            <p class="lead">Autorité organisatrice qui coordonne le réseau régional.</p>
+            <div class="li"><svg class="icon"><use href="#i-bus"/></svg><span>Réseau de bus</span></div>
+            <div class="li"><svg class="icon"><use href="#i-clock"/></svg><span>Horaires</span></div>
+            <div class="li"><svg class="icon"><use href="#i-ticket"/></svg><span>Titres et tarifs</span></div>
+            <div class="li"><svg class="icon"><use href="#i-search"/></svg><span>Calcul d’itinéraire</span></div>
+            <div class="li"><svg class="icon"><use href="#i-transfer"/></svg><span>Connexions avec les autres modes</span></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><svg class="icon"><use href="#i-bus"/></svg><h2>3 · RATP</h2></div>
+          <div class="panel-body">
+            <p class="lead">Opérateur majeur, présent notamment sur les bus de Paris et de la proche banlieue.</p>
+            <div class="chain">
+              <span class="cnode">ÎDFM</span><svg class="icon carrow"><use href="#i-arrow"/></svg>
+              <span class="cnode">Réseau</span><svg class="icon carrow"><use href="#i-arrow"/></svg>
+              <span class="cnode">Opérateurs</span><svg class="icon carrow"><use href="#i-arrow"/></svg>
+              <span class="cnode">Lignes</span><svg class="icon carrow"><use href="#i-arrow"/></svg>
+              <span class="cnode">Voyageurs</span>
+            </div>
+            <div class="li"><svg class="icon"><use href="#i-bus"/></svg><span>Bus à Paris et en proche banlieue</span></div>
+            <div class="li"><svg class="icon"><use href="#i-network"/></svg><span>L’un des opérateurs du réseau</span></div>
+            <div class="note"><svg class="icon"><use href="#i-info"/></svg>La RATP n’exploite pas toutes les lignes de bus d’Île-de-France.</div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- CENTER MAP -->
+      <div class="mapwrap">
+        <div class="map-card">
+          <div class="map-head">
+            <svg class="icon"><use href="#i-map"/></svg>
+            <h2>Île-de-France — Paris · Petite couronne · Grande couronne</h2>
+            <span class="pill"><svg class="icon" style="width:13px;height:13px;color:#9DB8D6;"><use href="#i-bus"/></svg>Réseau ÎdFM</span>
+          </div>
+          <div class="map-body">
+<svg class="idf-map" viewBox="0 0 760.0 617.9" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carte simplifiée de l'Île-de-France : Paris, Petite couronne, Grande couronne">
+<g class="depts">
+<path class="dept d-paris" d="M321.5 238.3 307.9 233.0 303.4 230.3 301.3 232.6 299.5 232.7 300.3 230.0 295.2 229.0 294.0 227.0 294.3 223.5 284.6 219.3 287.2 211.3 292.0 207.4 295.3 208.6 296.4 205.4 303.7 206.3 305.7 202.2 317.7 194.8 341.6 194.7 344.1 198.0 344.9 203.6 348.1 205.5 349.1 207.7 350.5 221.6 349.1 229.2 352.5 228.5 351.6 225.6 352.4 224.0 353.3 225.4 357.6 225.9 358.8 223.3 366.2 225.0 368.8 228.1 367.1 231.3 366.4 237.2 364.5 238.3 357.7 237.7 354.9 234.9 348.7 234.2 345.7 231.8 332.2 238.8 329.8 238.8 328.6 237.5 326.8 238.8 321.5 238.3Z"><title>Paris</title></path>
+<path class="dept d-grande" d="M403.7 303.2 403.4 301.7 407.2 300.4 403.1 297.2 402.5 294.4 403.9 292.1 405.0 292.4 406.3 287.2 406.9 287.6 410.1 282.9 411.6 282.5 411.8 280.1 408.4 277.4 410.6 274.3 412.1 274.5 414.2 271.1 412.6 267.6 414.4 268.4 418.8 266.7 415.8 260.4 411.0 262.1 408.9 260.9 408.5 258.2 409.5 258.4 409.5 256.0 411.7 254.9 411.5 253.2 413.4 249.7 410.7 247.3 412.2 243.9 410.8 243.3 412.2 241.5 411.6 236.1 410.6 232.8 409.1 233.8 408.8 229.6 404.5 219.4 407.6 218.3 407.2 216.8 408.8 216.0 409.3 214.1 404.0 211.8 402.3 212.9 403.4 211.1 402.5 208.5 403.6 205.7 401.4 204.8 399.5 202.2 400.7 200.5 403.2 200.2 403.9 199.1 409.0 198.3 409.6 195.9 408.0 193.5 410.8 191.2 409.6 190.3 409.6 184.3 414.3 180.0 414.5 175.7 412.0 175.2 409.9 167.5 400.6 154.3 400.9 153.5 406.1 154.1 405.5 151.5 407.1 150.6 405.1 143.1 402.8 141.2 403.0 140.3 401.3 140.4 401.2 139.4 403.3 139.3 402.7 137.5 399.1 137.0 397.3 138.2 396.0 135.6 393.1 137.2 391.9 133.7 391.0 133.6 391.2 130.9 394.7 131.7 401.8 128.4 403.0 124.9 402.4 123.1 405.6 119.4 411.5 118.8 408.2 116.0 408.6 113.3 404.6 115.2 403.5 111.8 407.8 106.8 410.2 101.9 414.6 98.7 417.0 94.0 419.2 94.5 421.3 93.7 421.8 91.2 423.9 90.1 424.8 87.0 426.0 87.7 425.7 90.4 427.6 91.8 430.6 91.1 440.0 97.4 446.0 104.5 444.2 108.2 447.0 109.8 449.5 109.5 454.7 104.4 454.8 102.0 456.1 101.5 456.2 104.2 457.8 104.5 458.8 106.7 459.7 111.9 466.1 111.7 470.4 109.7 473.4 106.6 474.4 106.8 477.6 104.1 471.1 100.1 478.2 100.3 476.5 97.3 485.2 92.6 488.8 97.9 492.1 99.8 497.4 99.2 500.8 105.2 500.7 106.8 506.1 106.8 512.0 102.0 514.5 103.3 516.8 99.0 524.3 103.0 527.6 101.3 530.2 103.2 532.0 97.6 535.7 98.9 539.8 95.8 542.1 104.8 546.1 106.4 547.5 99.7 550.8 96.8 552.6 98.4 553.5 95.8 555.9 95.9 561.4 98.8 561.8 97.0 568.0 99.1 570.6 97.3 572.8 99.1 572.2 96.3 569.6 93.2 569.7 91.1 575.2 82.3 578.3 85.2 583.0 85.3 587.5 87.5 592.2 86.5 593.7 88.3 597.9 87.7 599.9 90.4 607.2 91.5 603.2 100.0 607.6 102.9 611.1 107.2 612.8 110.7 613.0 116.1 615.7 116.0 616.0 118.6 612.4 120.2 613.2 121.6 611.8 123.5 612.2 125.6 611.0 126.2 611.2 127.3 605.7 130.7 608.2 134.6 607.9 136.8 612.4 136.5 615.1 138.5 618.3 138.9 617.8 140.8 618.8 140.3 620.2 142.8 621.6 142.9 622.3 146.5 627.6 147.9 627.6 149.9 629.1 149.3 628.4 152.7 629.5 153.0 629.8 155.4 634.3 155.3 636.0 156.6 639.5 167.5 638.7 168.0 640.7 169.7 639.7 171.9 641.3 174.9 643.7 175.7 648.1 174.2 655.0 169.9 657.8 177.7 657.9 184.2 663.8 190.7 665.1 189.6 665.9 190.4 669.3 186.4 670.2 187.1 670.7 185.9 671.8 187.3 674.1 185.7 676.3 183.5 676.8 180.8 679.6 190.2 677.9 192.5 677.0 198.5 682.1 201.0 681.2 202.0 681.9 203.2 681.2 203.6 681.3 210.0 684.8 210.3 685.3 208.0 689.7 207.7 689.7 210.3 688.3 210.6 687.8 212.0 689.1 213.9 692.1 213.9 695.9 212.1 698.1 215.6 703.3 215.8 705.6 217.9 704.3 219.6 705.0 221.7 703.7 222.0 703.2 224.7 707.9 225.6 708.5 226.6 710.3 225.0 711.8 220.6 716.9 220.2 719.0 229.1 716.8 234.1 717.6 239.2 715.4 240.8 713.3 237.1 711.8 236.3 708.0 237.8 708.4 239.3 704.2 241.3 701.8 240.4 698.7 240.8 693.4 237.9 689.1 242.3 691.5 245.2 694.6 245.4 695.6 246.7 702.1 245.3 701.4 248.1 702.7 251.6 702.0 256.3 700.7 254.9 697.8 257.8 695.9 255.4 690.7 255.5 686.2 268.3 687.4 270.5 690.8 271.9 692.6 270.6 696.5 270.7 697.4 268.7 700.2 271.4 700.1 276.4 702.8 280.0 711.6 279.4 710.1 292.9 710.7 294.6 709.7 295.2 714.3 300.1 712.5 300.2 712.2 306.5 709.2 306.6 704.0 310.9 704.6 311.6 702.3 313.3 703.5 316.2 701.6 317.9 708.4 323.4 705.2 333.0 707.5 333.4 713.9 331.6 719.5 326.2 727.9 328.4 733.3 326.8 727.9 331.7 728.5 333.6 735.0 334.5 740.7 339.5 742.0 342.2 735.9 342.6 735.7 344.4 733.8 345.6 723.0 348.6 727.4 356.3 719.6 356.0 716.9 361.1 712.8 363.0 710.1 366.3 712.3 369.7 713.1 369.4 713.8 375.8 716.4 376.8 717.1 378.3 717.1 379.4 714.8 379.2 715.7 381.4 713.6 381.4 707.2 387.5 705.0 388.0 704.6 387.1 701.4 388.1 696.8 386.9 695.7 385.5 692.5 385.5 689.5 388.3 695.7 395.2 699.7 404.9 699.5 407.9 694.7 407.2 691.0 410.3 689.4 408.8 689.0 410.1 687.0 410.0 687.4 411.4 685.4 411.0 685.1 412.5 682.0 413.6 683.7 414.7 684.6 418.2 686.2 418.2 687.5 419.7 685.7 422.2 689.9 427.6 689.4 434.3 688.2 436.2 686.0 435.7 686.5 437.8 684.8 442.7 686.8 442.1 691.7 443.7 691.6 445.8 690.3 446.7 688.5 445.6 688.5 446.9 692.3 447.4 695.2 446.4 692.7 459.8 688.4 460.1 683.5 455.7 680.1 455.3 678.6 458.2 676.4 457.7 674.9 463.8 675.7 469.2 672.7 469.7 672.8 466.0 670.9 465.9 670.0 468.7 665.9 468.8 665.5 470.3 664.0 468.8 661.1 468.6 657.5 466.6 656.6 466.7 657.1 468.8 655.1 468.9 653.2 467.5 653.4 466.0 649.8 467.3 650.4 465.2 647.5 464.4 647.4 466.5 642.4 466.2 642.1 468.5 640.0 468.8 640.3 471.3 638.5 471.5 637.7 473.0 630.4 470.2 627.2 470.2 619.2 473.7 615.8 469.9 613.9 471.3 612.1 467.4 609.4 466.4 607.7 470.0 602.8 469.6 601.3 470.4 600.8 472.6 598.9 471.0 598.5 469.0 594.5 470.6 594.7 471.8 592.5 471.1 590.7 472.1 586.0 481.0 584.7 479.9 585.2 477.4 584.4 476.7 580.9 477.0 577.4 474.9 571.3 476.9 569.1 475.3 567.5 475.5 563.3 484.6 564.1 485.1 563.1 485.9 563.1 488.5 565.5 490.9 560.2 495.5 559.8 497.9 555.6 503.5 557.2 505.1 560.0 505.2 557.0 509.4 560.8 514.1 559.1 519.2 566.1 521.9 565.2 526.4 566.9 532.8 562.8 532.2 561.3 533.3 560.0 537.1 556.9 540.4 557.0 542.1 558.4 542.9 554.4 547.8 552.1 555.1 549.5 555.0 548.2 556.3 546.8 554.0 543.7 555.7 541.3 555.8 541.6 560.3 540.7 561.3 536.4 563.2 535.3 562.5 530.2 567.4 528.9 567.4 528.1 571.1 528.7 577.6 505.3 581.3 499.1 589.2 494.4 592.8 490.3 592.9 489.1 595.2 482.4 594.2 480.9 588.9 482.4 584.8 481.3 584.0 485.0 580.0 485.9 577.4 485.5 576.2 482.6 577.2 482.0 575.2 480.4 574.7 479.3 577.0 474.8 575.5 472.3 578.5 470.8 576.9 467.8 577.6 468.2 578.5 466.6 579.4 465.8 578.1 460.2 576.1 461.8 579.5 466.1 582.9 466.6 586.9 454.7 591.4 449.5 598.6 440.0 597.1 435.6 599.9 428.8 591.2 427.0 590.3 414.3 594.2 404.8 594.3 403.3 589.4 399.1 588.9 392.0 589.6 385.9 596.5 386.6 597.5 375.8 596.7 370.9 595.2 368.6 595.4 368.2 596.4 367.1 595.4 363.5 598.9 361.7 597.3 359.5 597.4 360.0 594.2 362.5 593.8 362.7 592.7 365.5 591.4 368.0 585.5 370.5 585.2 370.2 582.5 370.7 581.4 371.8 582.0 373.4 577.1 381.3 581.2 384.8 576.2 383.4 573.9 384.5 571.7 381.6 569.2 385.4 563.9 383.9 563.6 383.6 562.3 387.1 561.3 387.0 558.4 385.5 557.9 386.4 555.2 385.0 553.5 385.1 551.2 384.0 551.2 383.7 546.0 385.4 544.3 381.5 545.1 381.3 538.6 373.7 538.4 371.0 535.6 371.9 532.9 368.6 529.9 362.1 532.7 360.8 530.0 358.6 531.0 355.3 529.8 352.9 527.3 350.9 517.7 352.8 513.2 352.9 509.4 346.4 499.0 345.7 495.5 342.7 492.8 342.5 487.9 345.7 489.6 348.7 487.8 354.0 487.2 356.5 488.8 355.1 481.8 356.8 478.6 358.8 479.9 360.0 477.0 358.8 476.9 357.8 475.2 356.3 475.9 355.1 474.5 359.6 470.6 361.0 472.3 362.2 471.8 361.2 469.0 362.5 467.8 368.6 467.0 373.9 463.4 370.2 459.8 373.0 457.7 373.5 456.2 378.7 456.5 380.1 458.5 386.3 453.9 386.6 452.2 395.2 453.9 388.6 446.6 385.1 440.5 380.9 439.3 381.7 435.1 379.2 433.8 381.5 430.7 380.4 429.6 381.7 428.3 378.4 425.1 381.2 423.0 379.8 420.1 381.6 418.6 379.9 417.3 380.9 416.3 379.6 414.3 380.7 413.5 379.8 410.8 382.6 408.9 383.7 404.2 382.9 403.4 384.4 399.7 383.9 397.9 382.2 398.7 382.1 394.2 378.3 393.9 379.0 389.8 378.2 389.7 382.9 380.5 378.9 380.6 378.9 379.3 380.1 379.0 384.4 371.4 386.0 370.4 385.7 366.5 389.6 366.1 390.0 364.6 386.6 364.9 385.4 359.1 389.4 357.4 391.2 354.8 393.2 354.0 394.2 349.0 393.1 345.0 388.0 344.2 388.4 339.8 384.5 335.9 387.8 333.8 391.6 334.8 392.1 333.7 393.6 333.7 393.5 327.0 395.6 325.2 395.4 324.1 393.2 324.2 390.7 321.2 392.3 320.0 391.1 318.7 392.8 317.6 394.5 314.0 395.5 313.7 396.1 315.1 397.2 312.4 398.8 311.6 400.6 315.2 402.6 316.3 403.7 315.3 403.5 312.1 408.6 310.0 406.6 306.1 407.2 304.4 403.7 303.2Z"><title>Seine-et-Marne</title></path>
+<path class="dept d-grande" d="M73.7 102.8 75.5 106.2 80.7 102.6 84.5 102.3 85.3 101.1 91.0 101.0 95.5 102.5 103.8 108.8 103.1 114.2 107.7 116.2 109.7 118.6 110.7 117.8 113.0 119.9 115.9 117.1 122.5 118.2 122.1 115.5 124.6 113.0 123.1 112.2 125.5 110.4 128.0 113.1 130.2 113.7 137.2 113.1 136.5 111.8 139.1 109.8 138.0 105.8 142.8 105.4 144.7 103.6 149.0 103.7 153.1 107.3 154.7 111.1 157.1 110.7 161.6 113.4 158.2 125.1 157.0 125.0 156.8 126.0 159.4 126.4 159.6 130.9 161.6 132.1 159.8 134.3 160.4 135.9 163.4 133.3 165.0 134.4 167.3 133.1 167.7 125.8 171.4 123.9 170.5 122.9 174.0 121.4 176.4 118.4 178.3 119.5 177.7 121.6 186.4 132.0 190.1 129.5 193.0 132.0 195.5 130.0 198.9 133.2 205.0 132.4 211.9 140.8 212.2 142.5 215.8 144.4 217.5 142.5 222.4 143.0 229.8 139.0 232.3 142.4 233.6 142.1 233.4 139.9 235.8 138.6 236.9 135.7 245.5 138.8 249.3 133.8 251.3 138.3 249.1 146.8 250.3 146.6 251.3 148.9 260.9 150.7 264.5 152.6 269.2 161.0 267.1 167.5 268.0 168.2 268.7 167.0 272.9 168.3 272.8 169.0 278.3 169.4 278.2 174.3 275.9 176.9 278.2 183.7 276.0 185.4 277.6 187.7 275.7 189.0 276.5 190.7 268.3 195.0 265.5 197.8 263.7 201.2 263.8 203.9 258.9 210.8 258.7 211.6 261.6 211.0 259.3 217.0 262.6 222.4 259.5 222.2 257.7 225.4 257.8 228.4 259.7 238.3 263.5 240.7 264.9 240.7 265.8 238.9 267.7 239.3 270.5 244.4 269.6 244.6 270.1 246.8 271.8 246.8 270.5 248.6 277.2 248.0 280.3 251.7 279.4 253.6 284.3 254.4 285.4 256.7 284.4 257.2 284.6 258.6 286.2 262.5 280.5 261.8 279.7 263.1 278.1 262.8 276.5 261.6 276.7 259.7 273.3 260.0 271.5 261.4 273.0 261.9 274.0 265.5 272.2 271.0 269.7 268.6 265.3 269.5 262.9 273.1 259.6 270.7 256.3 275.0 254.7 275.4 255.7 277.1 254.0 279.8 251.0 279.5 250.8 278.3 248.7 277.1 247.6 278.4 242.9 279.5 241.7 281.5 243.3 282.1 243.0 283.2 246.3 287.2 244.1 289.0 245.6 291.6 242.3 297.6 241.0 297.6 241.3 302.1 238.2 300.0 235.9 306.6 231.2 304.1 230.0 306.1 223.4 305.5 222.3 309.4 219.4 309.7 217.4 321.2 211.6 319.9 211.2 325.9 214.2 327.6 213.3 329.7 218.5 328.9 220.8 329.8 219.6 334.4 221.7 334.9 223.6 339.8 226.2 340.2 226.4 341.7 228.4 341.8 228.6 342.8 226.3 345.1 226.5 346.8 219.5 348.2 218.6 354.1 219.6 354.3 220.0 356.7 215.5 361.4 215.7 363.3 213.2 367.1 213.8 373.0 207.3 374.2 202.5 372.6 200.5 375.0 196.5 371.6 191.1 372.1 186.5 370.2 185.3 378.3 188.4 380.9 190.2 380.3 191.4 382.8 197.2 386.1 196.5 384.1 198.6 383.5 199.8 384.4 200.4 389.5 196.7 389.4 196.9 388.3 195.1 388.1 189.2 393.6 189.8 395.6 188.6 396.1 189.5 397.5 187.4 399.4 185.2 405.1 184.6 413.1 182.1 412.7 178.7 416.4 178.5 418.7 179.7 419.0 179.0 422.0 181.3 423.6 180.6 430.0 177.5 430.0 177.5 431.2 175.9 431.2 174.9 434.8 163.8 434.1 158.9 430.5 154.6 430.9 154.3 427.8 152.8 427.6 151.7 420.0 139.7 420.5 140.3 417.1 136.3 412.6 137.9 411.1 134.3 408.0 136.0 404.5 135.4 402.8 133.4 402.8 132.3 397.9 131.3 398.0 130.9 388.5 134.8 375.0 131.7 375.6 131.2 374.1 128.2 372.3 126.4 369.1 127.3 366.9 124.6 364.0 120.6 363.3 120.0 365.3 117.5 365.4 115.8 363.7 114.3 365.2 108.1 362.4 108.4 360.6 105.6 358.7 111.3 348.0 109.9 343.3 105.9 344.8 102.4 343.4 100.5 345.2 98.9 342.9 101.7 341.9 99.7 340.7 97.7 341.2 96.1 343.3 93.9 342.1 93.3 343.8 89.5 339.2 90.6 336.6 87.6 334.2 87.9 331.5 83.8 327.5 85.7 326.0 85.4 324.3 81.4 325.8 77.9 325.2 71.7 318.6 71.1 315.5 73.4 313.4 72.2 311.9 74.7 304.5 72.5 304.6 68.7 301.7 67.6 302.9 64.5 301.1 65.5 299.4 62.7 297.7 67.8 295.0 66.4 293.5 69.6 288.1 71.1 288.4 76.1 280.3 77.6 280.3 79.7 274.1 74.0 269.1 73.5 267.5 65.7 267.0 64.3 265.0 66.4 260.8 64.8 259.7 65.2 258.9 63.9 258.8 64.2 257.5 62.6 255.9 62.2 251.7 64.1 250.4 62.9 249.4 63.8 247.2 62.8 244.4 64.5 244.4 64.0 241.6 67.6 239.4 65.2 233.3 63.4 231.8 65.2 230.2 68.6 229.6 69.9 226.8 62.8 224.1 65.2 215.7 63.1 215.5 57.1 211.9 56.5 213.8 55.3 213.3 52.2 209.5 55.6 204.4 56.8 204.5 58.2 200.1 54.7 198.7 53.5 195.9 49.8 192.7 49.5 190.8 51.9 189.5 51.9 188.5 49.5 183.5 42.7 182.0 41.2 183.8 38.9 180.9 40.5 177.3 36.9 173.9 40.1 167.4 36.7 167.9 34.6 165.7 35.9 165.6 36.1 163.8 33.6 161.8 35.2 159.2 42.7 154.5 40.6 154.4 39.1 151.7 35.8 154.1 29.9 154.5 29.0 153.4 27.8 153.9 28.6 155.3 26.4 156.4 24.7 151.6 23.0 150.3 23.2 149.1 26.6 148.6 25.8 146.7 29.1 143.9 29.5 139.4 27.5 138.3 28.8 136.1 27.8 134.1 21.9 129.6 21.9 125.2 18.0 119.2 20.2 117.0 18.3 115.5 21.6 113.2 23.2 110.0 29.6 116.3 32.0 116.5 34.2 113.7 37.5 112.6 39.8 108.5 41.3 102.1 39.1 99.0 41.8 101.3 43.7 107.8 50.5 105.0 56.3 107.4 60.1 105.2 61.5 102.5 72.4 99.1 73.1 99.6 71.8 100.0 73.7 102.8Z"><title>Yvelines</title></path>
+<path class="dept d-grande" d="M285.4 259.5 286.7 260.6 287.6 264.7 289.5 264.5 292.4 267.5 297.6 268.0 300.0 266.8 300.1 269.1 302.4 269.6 302.0 270.4 305.6 274.4 302.1 278.4 303.7 282.1 311.4 277.9 311.9 283.7 315.5 283.2 317.0 279.8 315.1 279.2 316.4 277.8 315.5 276.6 319.8 272.5 323.3 277.1 324.9 278.0 327.0 277.5 329.9 279.2 332.2 275.1 334.4 275.1 334.8 288.6 339.7 289.1 342.0 287.3 344.0 288.0 345.6 285.3 348.3 285.7 350.3 288.2 349.8 289.8 353.6 287.3 358.6 285.8 359.8 286.3 359.4 287.9 361.6 291.3 361.5 287.7 363.4 288.4 363.5 286.2 365.4 286.7 367.5 283.7 368.2 285.2 371.9 284.7 381.3 280.5 384.5 284.0 385.1 290.8 386.9 293.9 389.3 294.9 389.8 299.1 391.5 298.6 391.6 300.5 393.4 299.0 396.4 305.0 403.7 303.2 407.2 304.4 406.6 306.1 408.6 310.0 403.5 312.1 403.7 315.3 402.6 316.3 400.6 315.2 398.1 311.5 396.6 314.7 394.5 314.0 392.8 317.6 391.1 318.7 392.3 320.0 390.7 321.2 393.2 324.2 395.4 324.1 395.6 325.2 393.5 327.0 393.3 334.2 392.1 333.7 391.6 334.8 387.8 333.8 384.5 335.9 388.4 339.8 388.0 344.2 393.1 345.0 394.2 349.0 393.2 354.0 391.2 354.8 389.4 357.4 385.4 359.1 386.6 364.9 390.0 364.6 389.6 366.1 385.7 366.5 386.0 370.4 384.4 371.4 380.1 379.0 378.9 379.3 378.9 380.6 382.9 380.5 380.2 385.0 381.0 385.7 379.4 388.7 378.5 388.6 378.3 393.9 382.1 394.2 382.2 398.7 383.9 397.9 384.4 399.7 382.9 403.4 383.7 404.2 382.6 408.9 379.8 410.8 380.7 413.5 379.6 414.3 380.9 416.3 379.9 417.3 381.6 418.6 379.8 420.1 381.2 423.0 378.4 425.1 381.7 428.3 380.4 429.6 381.5 430.7 379.2 433.8 381.7 435.1 380.9 439.3 385.1 440.5 388.6 446.6 395.2 453.9 386.6 452.2 386.3 453.9 380.1 458.5 378.7 456.5 373.5 456.2 373.0 457.7 370.2 459.8 373.9 463.4 368.6 467.0 362.5 467.8 361.2 469.0 362.2 471.8 361.0 472.3 359.6 470.6 355.1 474.5 356.3 475.9 357.8 475.2 358.8 476.9 360.0 477.0 358.8 479.9 356.8 478.6 355.1 481.8 356.5 488.8 354.0 487.2 348.7 487.8 345.7 489.6 342.5 487.9 342.7 492.8 345.8 496.0 344.3 497.0 344.9 498.6 340.2 500.6 334.6 502.2 333.6 500.5 330.6 502.3 328.9 499.2 325.0 498.0 322.5 492.5 320.2 493.0 320.0 489.6 319.7 491.3 318.7 489.9 316.8 491.0 314.9 490.7 309.1 502.5 304.8 500.2 301.1 500.5 301.1 499.5 299.2 499.1 297.8 501.3 298.7 501.8 296.5 503.0 294.7 506.6 291.8 507.5 293.2 498.3 289.4 498.2 292.1 490.5 289.2 490.1 287.8 490.8 288.1 492.2 285.8 491.3 286.1 489.6 284.5 487.8 281.7 489.0 280.6 485.6 278.8 485.0 278.7 483.4 277.1 483.6 278.1 484.8 277.3 486.5 272.2 489.9 272.2 492.2 270.2 494.1 270.2 495.5 271.0 494.9 271.1 495.7 269.7 500.7 266.6 498.4 265.7 500.1 260.0 498.5 261.1 504.4 262.9 504.4 263.9 507.5 254.4 507.1 245.7 508.3 246.7 503.0 244.1 502.8 237.0 509.8 225.8 509.1 225.6 511.4 221.9 514.8 220.6 512.8 216.3 512.3 214.6 513.9 211.7 514.6 204.4 513.1 199.3 513.4 198.4 512.8 199.0 510.4 201.0 510.7 201.7 509.1 199.3 508.8 198.0 510.1 198.4 508.4 195.8 509.2 194.8 503.8 193.6 503.3 198.7 498.5 199.0 500.2 200.6 500.1 201.1 497.0 199.0 494.7 201.7 492.0 197.0 485.3 199.3 483.5 198.6 477.7 204.0 473.7 202.5 472.9 202.3 471.2 200.2 471.0 201.6 467.9 201.0 466.1 196.3 465.0 198.9 460.1 198.6 457.0 200.3 453.8 189.4 451.5 184.5 453.0 183.2 451.7 184.7 449.2 182.3 448.2 182.9 446.3 184.4 446.3 184.5 444.2 187.1 444.6 187.4 441.6 186.3 441.1 186.1 439.2 186.9 437.0 185.9 436.7 188.2 433.5 184.8 433.0 184.7 429.0 183.3 428.3 183.6 425.2 181.1 424.9 181.3 423.6 179.7 423.3 179.7 419.0 178.5 418.7 178.7 416.4 182.1 412.7 184.6 413.1 185.2 405.1 187.4 399.4 189.5 397.5 188.6 396.1 189.8 395.6 189.2 393.6 195.1 388.1 196.9 388.3 196.7 389.4 200.4 389.5 200.1 385.8 197.9 383.2 196.5 384.1 197.2 386.1 191.4 382.8 190.2 380.3 188.4 380.9 185.3 378.3 185.9 371.3 186.5 370.2 191.1 372.1 196.5 371.6 200.5 375.0 202.5 372.6 207.3 374.2 213.8 373.0 213.2 367.1 215.7 363.3 215.5 361.4 220.0 356.7 219.6 354.3 218.6 354.1 219.5 348.2 226.5 346.8 226.3 345.1 228.6 342.8 228.4 341.8 226.4 341.7 226.2 340.2 223.6 339.8 221.7 334.9 219.6 334.4 220.8 329.8 218.5 328.9 213.3 329.7 214.2 327.6 211.2 325.9 211.6 319.9 217.4 321.2 219.4 309.7 222.3 309.4 223.4 305.5 230.0 306.1 231.2 304.1 235.9 306.6 238.2 300.0 241.3 302.1 241.0 297.6 242.3 297.6 245.6 291.6 244.1 289.0 246.3 287.2 243.0 283.2 243.3 282.1 241.7 281.5 242.9 279.5 247.6 278.4 248.7 277.1 250.8 278.3 251.0 279.5 254.0 279.8 255.7 277.1 254.7 275.4 256.3 275.0 259.6 270.7 262.9 273.1 265.3 269.5 267.2 269.0 269.7 268.6 271.6 271.0 273.1 270.4 274.0 265.5 273.0 261.9 271.5 261.4 273.3 260.0 276.7 259.7 276.5 261.6 279.7 263.1 280.5 261.8 286.2 262.5 285.4 259.5Z"><title>Essonne</title></path>
+<path class="dept d-petite" d="M307.5 168.7 319.8 171.7 322.8 174.1 323.1 178.4 321.7 181.5 317.4 186.9 315.3 187.9 317.7 192.8 317.4 195.0 305.7 202.2 303.7 206.3 296.4 205.4 295.3 208.6 292.0 207.4 287.2 211.3 284.6 219.3 294.3 223.5 294.0 227.0 295.2 229.0 300.3 230.0 299.5 232.7 301.3 232.6 303.4 230.3 307.9 233.0 321.7 237.6 319.3 242.2 316.7 242.8 316.9 244.0 319.5 243.7 317.0 253.4 319.2 254.2 319.7 258.2 313.6 270.3 314.5 270.8 314.1 271.9 317.7 273.7 315.5 276.6 316.4 277.8 315.1 279.2 317.0 279.8 315.5 283.2 313.3 283.8 311.9 283.7 311.4 277.9 303.7 282.1 302.1 278.4 305.6 274.4 302.0 270.4 302.4 269.6 300.1 269.1 300.0 266.8 297.6 268.0 292.4 267.5 289.5 264.5 287.6 264.7 286.7 260.6 284.6 258.6 284.4 257.2 285.4 256.7 284.3 254.4 279.4 253.6 280.3 251.7 277.2 248.0 270.5 248.6 271.8 246.8 270.1 246.8 269.6 244.6 270.5 244.4 267.7 239.3 265.8 238.9 264.9 240.7 263.5 240.7 259.7 238.3 257.8 228.4 257.7 225.4 259.5 222.2 262.6 222.4 259.3 217.0 261.6 211.0 258.7 211.6 262.0 205.3 263.8 203.9 263.7 201.2 265.5 197.8 268.3 195.0 278.4 189.5 287.0 180.8 297.2 172.6 307.5 168.7Z"><title>Hauts-de-Seine</title></path>
+<path class="dept d-petite" d="M397.3 138.2 399.1 137.0 402.7 137.5 403.3 139.3 401.2 139.4 401.3 140.4 403.0 140.3 402.8 141.2 405.1 143.1 407.1 150.6 405.5 151.5 406.1 154.1 400.9 153.5 400.6 154.3 409.9 167.5 412.0 175.2 414.5 175.7 414.3 180.0 409.6 184.3 409.6 190.3 410.8 191.2 408.0 193.5 409.6 195.9 409.0 198.3 403.9 199.1 403.2 200.2 400.7 200.5 399.5 202.2 401.4 204.8 403.6 205.7 402.5 208.5 403.4 211.1 402.3 212.9 404.0 211.8 409.3 214.1 408.8 216.0 407.2 216.8 407.6 218.3 404.5 219.4 408.8 229.6 409.1 233.8 410.6 232.8 411.6 236.1 412.2 241.5 410.8 243.3 403.2 239.3 402.6 237.6 403.9 234.8 400.2 233.4 395.4 228.4 394.3 229.0 392.2 228.0 391.7 227.1 393.0 226.7 391.0 223.6 389.0 224.4 387.7 221.6 385.7 222.1 384.5 220.4 383.8 221.1 381.0 217.4 378.0 218.0 377.8 215.6 368.3 215.6 367.9 217.7 363.3 218.3 361.0 220.6 356.9 219.5 354.9 221.8 350.5 221.6 349.1 207.7 348.1 205.5 344.9 203.6 344.1 198.0 341.6 194.7 317.4 195.0 317.7 192.8 315.3 187.9 317.4 186.9 321.7 181.5 323.1 178.4 322.8 174.1 319.8 171.7 307.5 168.7 306.6 164.9 310.2 160.8 312.3 162.9 313.7 162.2 318.4 165.3 320.1 164.2 321.9 166.4 325.7 159.8 329.1 161.1 330.7 157.4 333.3 156.7 339.6 158.3 344.2 164.1 347.4 166.1 350.9 164.3 351.3 165.2 354.5 164.6 357.2 166.6 360.4 165.7 365.3 166.6 368.0 161.8 368.7 162.5 372.6 159.0 374.6 160.3 376.7 156.5 377.8 157.4 378.5 156.8 377.7 156.3 379.3 156.1 380.4 153.9 384.2 152.5 383.5 150.6 385.6 149.6 385.6 148.1 387.0 147.5 390.2 140.6 394.3 140.4 396.0 141.7 395.9 139.8 397.3 139.8 397.3 138.2Z"><title>Seine-Saint-Denis</title></path>
+<path class="dept d-petite" d="M321.5 238.3 326.8 238.8 328.6 237.5 329.8 238.8 332.2 238.8 345.7 231.8 348.7 234.2 354.9 234.9 357.7 237.7 365.1 238.2 366.4 237.2 367.1 231.3 368.8 228.1 366.2 225.0 358.8 223.3 357.6 225.9 356.4 225.8 353.3 225.4 352.4 224.0 351.6 225.6 352.5 228.5 349.1 229.2 350.5 221.6 354.9 221.8 356.9 219.5 361.0 220.6 363.3 218.3 367.9 217.7 368.3 215.6 377.8 215.6 378.0 218.0 381.0 217.4 383.8 221.1 384.5 220.4 385.7 222.1 387.7 221.6 389.0 224.4 391.0 223.6 393.0 226.7 391.7 227.1 392.2 228.0 394.3 229.0 395.4 228.4 400.2 233.4 403.9 234.8 402.6 237.6 403.2 239.3 412.2 243.9 410.7 247.3 413.4 249.7 411.5 253.2 411.7 254.9 409.5 256.0 409.5 258.4 408.5 258.2 408.9 260.9 411.0 262.1 415.8 260.4 418.8 266.7 414.4 268.4 412.6 267.6 414.2 271.1 412.1 274.5 410.6 274.3 408.4 277.4 411.8 280.1 411.6 282.5 410.1 282.9 406.9 287.6 406.3 287.2 405.0 292.4 403.9 292.1 402.5 294.4 403.1 297.2 407.2 300.4 403.4 301.7 403.7 303.2 396.4 305.0 393.4 299.0 391.6 300.5 391.5 298.6 389.8 299.1 389.3 294.9 386.9 293.9 385.1 290.8 384.5 284.0 381.3 280.5 371.9 284.7 368.2 285.2 367.5 283.7 365.4 286.7 363.5 286.2 363.4 288.4 361.5 287.7 361.6 291.3 359.4 287.9 359.8 286.3 358.6 285.8 353.6 287.3 349.8 289.8 350.3 288.2 348.3 285.7 345.6 285.3 344.0 288.0 342.0 287.3 339.7 289.1 334.8 288.6 334.4 275.1 332.2 275.1 329.9 279.2 327.0 277.5 324.9 278.0 319.8 272.5 318.4 274.1 314.1 271.9 314.5 270.8 313.6 270.3 319.7 258.2 319.2 254.2 317.0 253.4 319.5 243.7 316.9 244.0 316.7 242.8 319.3 242.2 321.5 238.3Z"><title>Val-de-Marne</title></path>
+<path class="dept d-grande" d="M410.2 101.9 407.8 106.8 403.5 111.8 404.6 115.2 408.6 113.3 408.2 116.0 411.5 118.8 405.6 119.4 402.4 123.1 403.0 124.9 401.8 128.4 394.7 131.7 391.2 130.9 391.0 133.6 391.9 133.7 392.5 136.7 394.6 137.2 394.7 135.7 396.0 135.6 397.4 137.1 396.0 141.7 394.3 140.4 390.2 140.6 387.0 147.5 385.6 148.1 385.6 149.6 383.5 150.6 384.2 152.5 380.4 153.9 379.3 156.1 377.7 156.3 378.5 156.8 377.8 157.4 376.7 156.5 374.6 160.3 372.6 159.0 368.7 162.5 368.0 161.8 365.3 166.6 360.4 165.7 357.2 166.6 354.5 164.6 351.3 165.2 350.9 164.3 347.4 166.1 344.2 164.1 339.6 158.3 333.3 156.7 330.7 157.4 329.1 161.1 325.7 159.8 321.9 166.4 320.1 164.2 318.4 165.3 313.7 162.2 312.3 162.9 310.2 160.8 306.6 164.9 307.9 168.5 297.2 172.6 276.5 190.7 275.7 189.0 277.6 187.7 276.0 185.4 278.2 183.7 275.9 176.9 278.2 174.3 278.3 169.4 272.8 169.0 272.9 168.3 268.7 167.0 268.0 168.2 267.1 167.5 269.2 161.0 264.5 152.6 260.9 150.7 251.3 148.9 250.3 146.6 249.1 146.8 251.3 138.3 249.3 133.8 245.5 138.8 236.9 135.7 235.8 138.6 233.4 139.9 233.6 142.1 232.3 142.4 229.8 139.0 222.4 143.0 217.5 142.5 215.8 144.4 212.2 142.5 211.9 140.8 205.0 132.4 198.9 133.2 195.5 130.0 193.0 132.0 190.1 129.5 186.4 132.0 177.7 121.6 178.3 119.5 176.4 118.4 174.0 121.4 170.5 122.9 171.4 123.9 167.7 125.8 167.3 133.1 165.0 134.4 163.4 133.3 160.4 135.9 159.8 134.3 161.6 132.1 159.6 130.9 159.4 126.4 156.8 126.0 157.0 125.0 158.2 125.1 161.6 113.4 157.1 110.7 154.7 111.1 153.1 107.3 149.0 103.7 144.7 103.6 142.8 105.4 138.0 105.8 139.1 109.8 136.5 111.8 137.2 113.1 130.2 113.7 128.0 113.1 125.5 110.4 123.1 112.2 124.6 113.0 122.1 115.5 122.5 118.2 115.9 117.1 113.0 119.9 110.7 117.8 109.7 118.6 107.7 116.2 103.1 114.2 103.8 108.8 95.5 102.5 91.0 101.0 85.3 101.1 84.5 102.3 80.7 102.6 75.5 106.2 73.7 102.8 78.6 98.6 77.1 97.3 78.6 94.8 76.6 94.5 78.2 90.8 80.1 89.8 80.8 86.2 85.9 81.8 86.8 78.5 90.4 74.8 90.0 71.8 89.2 72.3 88.8 71.5 88.8 68.2 92.7 63.7 91.5 61.4 92.8 57.2 94.7 55.3 93.4 51.5 95.3 49.4 94.3 46.4 96.9 39.4 97.0 37.8 95.4 36.2 96.3 33.5 101.1 29.9 102.0 27.3 104.4 26.7 106.7 21.7 107.9 21.0 108.1 18.0 109.2 18.1 109.1 22.3 115.1 24.3 118.8 27.3 116.6 28.4 116.5 33.8 112.4 34.3 111.8 35.9 110.0 35.6 110.2 38.1 113.5 39.0 114.1 42.1 117.7 42.3 120.2 48.2 118.9 49.5 123.9 52.6 134.0 46.8 136.1 49.9 137.3 49.6 137.6 47.1 140.1 47.3 140.4 49.9 143.9 50.9 143.2 53.1 148.4 50.0 151.0 52.1 152.0 53.4 151.7 57.9 154.4 54.8 158.1 54.0 159.2 55.1 165.5 52.3 165.6 54.3 167.7 56.9 167.5 58.9 181.9 53.2 185.2 53.2 185.4 55.0 190.6 54.8 195.0 52.6 198.6 47.8 204.5 51.6 208.4 51.9 215.2 45.3 219.3 45.6 224.0 40.2 232.4 37.3 233.4 34.9 235.5 34.0 236.1 36.5 239.0 35.0 238.7 40.3 239.5 41.7 238.4 41.5 238.4 42.7 239.5 42.5 241.2 45.1 245.3 44.3 246.6 46.4 249.6 45.3 251.7 42.9 253.0 44.3 254.1 44.0 254.7 50.3 256.0 50.4 255.9 46.9 258.2 45.6 258.6 47.3 264.2 50.0 261.8 53.7 265.6 58.2 266.5 56.2 270.2 54.8 268.1 51.9 270.1 53.1 274.8 53.4 276.0 52.3 279.6 52.2 282.7 49.5 284.5 53.0 288.5 56.6 284.7 59.0 282.0 63.0 286.5 64.7 290.6 64.6 290.7 63.6 294.7 64.1 297.6 61.1 299.7 62.4 305.9 60.3 305.5 57.3 307.0 56.0 306.8 54.7 308.6 54.2 309.5 51.8 310.4 52.0 311.0 47.8 314.3 46.5 318.1 47.5 317.3 48.6 326.4 59.3 329.6 63.7 328.9 64.8 330.9 66.8 334.8 60.9 336.8 60.7 341.9 65.7 349.4 64.2 350.1 65.4 358.9 67.6 357.0 73.7 361.0 72.9 364.8 70.0 366.3 71.1 366.0 72.7 369.4 73.0 371.5 75.2 370.7 76.7 378.9 79.8 380.3 82.2 376.3 85.5 375.7 88.1 389.8 91.6 390.5 81.3 393.1 79.8 394.1 81.1 392.4 81.7 392.8 82.8 395.3 83.0 395.9 80.0 397.4 78.6 398.7 79.0 396.8 84.8 398.3 86.7 399.1 92.2 402.0 94.4 403.5 93.9 406.1 95.5 406.2 99.4 407.6 101.4 410.2 101.9Z"><title>Val-d'Oise</title></path>
+</g>
+<line class="callout" x1="329.2" y1="215.8" x2="385.2" y2="169.8"/>
+<text class="zlabel" x="389.2" y="165.8">Paris</text>
+<text class="zlabel" x="374.7" y="292.8">Petite couronne</text>
+<text class="zlabel" x="537.9" y="336.7">Grande couronne</text>
+</svg>
+          </div>
+          <div class="legend">
+            <span class="lg"><i class="sw paris"></i>Paris</span>
+            <span class="lg"><i class="sw petite"></i>Petite couronne</span>
+            <span class="lg"><i class="sw grande"></i>Grande couronne</span>
+            <span class="cap">Carte simplifiée — zones du réseau, sans détail des lignes</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="col">
+
+        <section class="panel gold">
+          <div class="panel-head"><svg class="icon"><use href="#i-clock"/></svg><h2>5 · Horaires</h2></div>
+          <div class="panel-body">
+            <div class="li"><svg class="icon"><use href="#i-clock"/></svg><span>Heure de départ et d’arrivée</span></div>
+            <div class="li"><svg class="icon"><use href="#i-clock"/></svg><span>Fréquence de passage</span></div>
+            <div class="li"><svg class="icon"><use href="#i-bus"/></svg><span>Premier et dernier bus</span></div>
+            <div class="li"><svg class="icon"><use href="#i-calendar"/></svg><span>Semaine · week-end · jours fériés</span></div>
+            <div class="searchbar"><svg class="icon"><use href="#i-search"/></svg><span>Rechercher un horaire ou un arrêt…</span></div>
+          </div>
+        </section>
+
+        <section class="panel accent">
+          <div class="panel-head"><svg class="icon"><use href="#i-ticket"/></svg><h2>7 · Tarifs et titres</h2></div>
+          <div class="panel-body">
+            <div class="li"><svg class="icon"><use href="#i-ticket"/></svg><span>Ticket à l’unité</span></div>
+            <div class="li"><svg class="icon"><use href="#i-ticket"/></svg><span>Navigo</span></div>
+            <div class="li"><svg class="icon"><use href="#i-calendar"/></svg><span>Pass / abonnements</span></div>
+            <div class="li"><svg class="icon"><use href="#i-cap"/></svg><span>Tarifs réduits : jeunes · seniors</span></div>
+            <div class="li"><svg class="icon"><use href="#i-heart"/></svg><span>Tarification sociale</span></div>
+            <div class="note"><svg class="icon"><use href="#i-euro"/></svg>Aucun prix affiché — les tarifs peuvent évoluer.</div>
+          </div>
+        </section>
+
+        <section class="panel gold">
+          <div class="panel-head"><svg class="icon"><use href="#i-transfer"/></svg><h2>8 · Correspondances</h2></div>
+          <div class="panel-body">
+            <p class="lead">Le bus se connecte aux autres modes de transport.</p>
+            <div class="li"><svg class="icon"><use href="#i-metro"/></svg><span>Métro</span></div>
+            <div class="li"><svg class="icon"><use href="#i-rer"/></svg><span>RER</span></div>
+            <div class="li"><svg class="icon"><use href="#i-train"/></svg><span>Train</span></div>
+            <div class="li"><svg class="icon"><use href="#i-tram"/></svg><span>Tramway</span></div>
+            <div class="li"><svg class="icon"><use href="#i-bus"/></svg><span>Autres bus</span></div>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+    <!-- BOTTOM ROW -->
+    <div class="brow">
+
+      <section class="panel">
+        <div class="panel-head"><svg class="icon"><use href="#i-bus"/></svg><h2>4 · Lignes de bus</h2></div>
+        <div class="panel-body">
+          <div class="routebox">
+            <svg class="route-svg" viewBox="0 0 320 42" preserveAspectRatio="xMidYMid meet">
+              <line class="rl-line" x1="16" y1="24" x2="304" y2="24"/>
+              <circle class="rl-term" cx="16" cy="24" r="5"/>
+              <circle class="rl-dot" cx="86" cy="24" r="3.4"/>
+              <circle class="rl-dot" cx="160" cy="24" r="3.4"/>
+              <circle class="rl-dot" cx="234" cy="24" r="3.4"/>
+              <circle class="rl-term" cx="304" cy="24" r="5"/>
+              <path class="rl-arrow" d="M292 17l8 7-8 7"/>
+            </svg>
+            <div class="rlabels"><span><b>Terminus A</b></span><span>Direction →</span><span><b>Terminus B</b></span></div>
+          </div>
+          <div class="chips">
+            <span class="chip"><svg class="icon"><use href="#i-bus"/></svg><span>Ligne</span></span>
+            <span class="chip"><svg class="icon"><use href="#i-arrow"/></svg><span>Direction</span></span>
+            <span class="chip"><svg class="icon"><use href="#i-stop"/></svg><span>Arrêts</span></span>
+            <span class="chip"><svg class="icon"><use href="#i-transfer"/></svg><span>Correspondances</span></span>
+            <span class="chip"><svg class="icon"><use href="#i-stop"/></svg><span>Arrêt de bus</span></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><svg class="icon"><use href="#i-search"/></svg><h2>6 · Recherche d’itinéraire</h2></div>
+        <div class="panel-body">
+          <div class="flow">
+            <div class="fstep"><div class="ic"><svg class="icon"><use href="#i-stop"/></svg></div><div class="t"><b>Départ</b></div></div>
+            <svg class="icon farrow"><use href="#i-arrow"/></svg>
+            <div class="fstep"><div class="ic"><svg class="icon"><use href="#i-bus"/></svg></div><div class="t"><b>Choisir</b> une ligne</div></div>
+            <svg class="icon farrow"><use href="#i-arrow"/></svg>
+            <div class="fstep"><div class="ic"><svg class="icon"><use href="#i-clock"/></svg></div><div class="t"><b>Vérifier</b> l’horaire</div></div>
+            <svg class="icon farrow"><use href="#i-arrow"/></svg>
+            <div class="fstep"><div class="ic"><svg class="icon"><use href="#i-transfer"/></svg></div><div class="t"><b>Correspondance</b></div></div>
+            <svg class="icon farrow"><use href="#i-arrow"/></svg>
+            <div class="fstep"><div class="ic"><svg class="icon"><use href="#i-flag"/></svg></div><div class="t"><b>Destination</b></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><svg class="icon"><use href="#i-info"/></svg><h2>9 · Informations voyageurs</h2></div>
+        <div class="panel-body">
+          <div class="igrid">
+            <div class="info-item"><svg class="icon"><use href="#i-stop"/></svg><span>Arrêt de bus</span></div>
+            <div class="info-item"><svg class="icon"><use href="#i-route"/></svg><span>Direction</span></div>
+            <div class="info-item"><svg class="icon"><use href="#i-clock"/></svg><span>Horaires</span></div>
+            <div class="info-item"><svg class="icon"><use href="#i-alert"/></svg><span>Perturbations</span></div>
+            <div class="info-item"><svg class="icon"><use href="#i-map"/></svg><span>Itinéraire</span></div>
+            <div class="info-item"><svg class="icon"><use href="#i-wheelchair"/></svg><span>Accessibilité</span></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+
+  <footer class="foot">Réseau de bus d’Île-de-France &bull; Horaires &bull; Lignes &bull; Tarifs &bull; Correspondances</footer>
+
+</div>
+
+<script>
+  (function(){
+    var stage = document.querySelector('.stage');
+    function fit(){
+      var s = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+      stage.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+    }
+    window.addEventListener('resize', fit);
+    window.addEventListener('orientationchange', fit);
+    fit();
+  })();
+</script>
+</body>
+</html>

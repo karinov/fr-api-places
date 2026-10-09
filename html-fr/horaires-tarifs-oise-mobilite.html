@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horaires et tarifs Oise Mobilité — Guide complet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#173B5E;
+    --navy-deep:#0F2A44;
+    --red:#C8102E;
+    --blue-tint:#F3F7FD;
+    --red-tint:#FDF3F4;
+    --border:#E1E6ED;
+    --border-strong:#B7C3D2;
+    --text:#173B5E;
+    --text-secondary:#5B6472;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{background:#DCE4EE;display:flex;align-items:center;justify-content:center;overflow:hidden;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;}
+  .icon{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+  /* Fixed 16:9 canvas, scaled to fit the viewport (no scroll) */
+  .stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform:translate(-50%,-50%) scale(1);transform-origin:center center;background:#fff;display:flex;flex-direction:column;padding:24px 30px 18px;box-shadow:0 14px 50px rgba(23,59,94,.22);}
+
+  /* ── Top bar ─────────────────────────────── */
+  .topbar{display:flex;align-items:center;gap:26px;padding-bottom:12px;border-bottom:2px solid var(--navy);flex-shrink:0;}
+  .brand{flex-shrink:0;max-width:600px;}
+  .brand .kicker{font-family:'Space Grotesk',sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--red);font-weight:600;}
+  .brand h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:31px;line-height:1.06;color:var(--navy);margin-top:5px;letter-spacing:-.01em;}
+  .brand p{font-size:12.5px;color:var(--text-secondary);margin-top:4px;}
+  .parcours{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;flex:1;}
+  .pstep{position:relative;display:flex;align-items:center;gap:8px;flex:1;max-width:225px;background:var(--blue-tint);border:1px solid var(--border);border-left:3px solid var(--navy);padding:8px 11px;}
+  .pstep .n{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:var(--red);}
+  .pstep .t{font-family:'Space Grotesk',sans-serif;font-size:10.5px;font-weight:500;color:var(--navy);line-height:1.2;text-transform:uppercase;letter-spacing:.03em;}
+  .pstep + .pstep{margin-left:20px;}
+  .pstep + .pstep::before{content:"";position:absolute;left:-20px;top:50%;width:20px;height:2px;background:var(--border-strong);transform:translateY(-50%);}
+  .pstep + .pstep::after{content:"";position:absolute;left:-5px;top:50%;width:6px;height:6px;border-top:2px solid var(--border-strong);border-right:2px solid var(--border-strong);transform:translateY(-50%) rotate(45deg);}
+
+  /* ── Board ───────────────────────────────── */
+  .board{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;padding-top:14px;}
+  .brow{display:flex;gap:12px;min-height:0;}
+  .brow.r1{flex:1.18;}
+  .brow.r2{flex:.8;}
+  .brow.r3{flex:1;}
+
+  .panel{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;border:1px solid var(--border);background:#fff;}
+  .panel-head{display:flex;align-items:center;gap:9px;padding:8px 12px;background:var(--navy);color:#fff;flex-shrink:0;}
+  .panel-head .num{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:11px;width:20px;height:20px;border:1.5px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .panel-head .icon{color:#fff;}
+  .panel-head h2{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;}
+  .panel-head .q{margin-left:auto;font-size:10.5px;color:#C9D8EA;font-style:italic;white-space:nowrap;}
+  .panel-body{padding:12px;flex:1;min-height:0;display:flex;flex-direction:column;}
+
+  .panel.deplacer{flex:1.18;border-top:3px solid var(--navy);}
+  .panel.horaires{flex:1;border-top:3px solid var(--navy);}
+  .panel.horaires .panel-head{background:var(--navy-deep);}
+  .panel.tarifs{flex:1.08;border-top:3px solid var(--red);border-color:#F2CBD1;background:var(--red-tint);}
+  .panel.tarifs .panel-head{background:var(--red);}
+  .panel.tarifs .panel-head .q{color:#FBD9DE;}
+
+  /* ── Se déplacer ─────────────────────────── */
+  .svc4{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:10px;flex:1;min-height:0;}
+  .sc{display:flex;flex-direction:column;justify-content:center;gap:5px;background:var(--blue-tint);border:1px solid var(--border);border-top:3px solid var(--navy);padding:10px 12px;}
+  .sc .icon{width:20px;height:20px;color:var(--navy);}
+  .sc h3{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:500;color:var(--navy);letter-spacing:.02em;}
+  .sc p{font-size:10.5px;color:var(--text-secondary);line-height:1.3;}
+
+  /* ── Horaires ────────────────────────────── */
+  .h-list{display:flex;flex-direction:column;gap:6px;flex:1;min-height:0;justify-content:center;}
+  .h-item{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--border);padding:5px 10px;}
+  .h-item .icon{width:15px;height:15px;color:var(--navy);}
+  .h-item span{font-size:11.5px;font-weight:500;}
+  .mini-flow{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;flex-shrink:0;}
+  .mini-flow .mf{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;color:var(--navy);background:var(--blue-tint);border:1px solid var(--border);padding:5px 13px;}
+  .mini-flow .ar{width:14px;height:14px;color:var(--border-strong);}
+
+  /* ── Tarifs ──────────────────────────────── */
+  .g-label{font-family:'Space Grotesk',sans-serif;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);font-weight:600;}
+  .tarifs-cols{display:flex;gap:14px;flex:1;min-height:0;}
+  .tcol{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;}
+  .fare{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-left:3px solid var(--red);padding:6px 9px;}
+  .fare .icon{width:16px;height:16px;color:var(--red);}
+  .fare h4{font-family:'Space Grotesk',sans-serif;font-size:10.5px;font-weight:500;color:var(--navy);letter-spacing:.03em;}
+  .fare p{font-size:9.5px;color:var(--text-secondary);line-height:1.2;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);padding:4px 8px;}
+  .chip .icon{width:12px;height:12px;color:var(--navy);}
+  .chip span{font-size:10px;font-weight:500;white-space:nowrap;}
+  .chip.acc .icon{color:var(--red);}
+  .note{display:flex;align-items:center;gap:7px;margin-top:9px;padding:6px 9px;background:#fff;border:1px dashed #E8B7BF;font-size:10px;font-style:italic;color:var(--red);}
+  .note .icon{width:13px;height:13px;color:var(--red);}
+
+  /* ── Itinéraires ─────────────────────────── */
+  .itin-body{display:flex;gap:16px;align-items:center;flex:1;min-height:0;}
+  .journey-diagram{display:flex;align-items:center;flex:1;min-width:0;background:var(--blue-tint);border:1px solid var(--border);padding:12px;height:100%;}
+  .jd-step{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;text-align:center;}
+  .jd-step .ic{width:34px;height:34px;background:#fff;border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;color:var(--navy);}
+  .jd-step .ic .icon{width:17px;height:17px;}
+  .jd-step .lbl{font-family:'Space Grotesk',sans-serif;font-size:9.5px;font-weight:500;color:var(--navy);text-transform:uppercase;line-height:1.2;}
+  .jd-arrow{width:16px;height:16px;color:var(--border-strong);flex-shrink:0;}
+  .chips5{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:352px;flex-shrink:0;}
+  .mc{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--border);border-left:3px solid var(--navy);padding:7px 9px;}
+  .mc .icon{width:14px;height:14px;color:var(--navy);}
+  .mc span{font-size:10.5px;font-weight:500;line-height:1.2;}
+
+  /* ── Services / Infos ────────────────────── */
+  .svc-list{display:flex;flex-direction:column;gap:5px;flex:1;min-height:0;justify-content:center;}
+  .svc{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--border);padding:6px 10px;}
+  .svc .icon{width:15px;height:15px;color:var(--navy);}
+  .svc .t{font-size:11.5px;font-weight:500;flex:1;}
+  .tag{font-size:8.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:600;padding:2px 6px;border:1px solid var(--border-strong);white-space:nowrap;}
+  .tag.service{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .tag.cat{background:var(--red-tint);color:var(--red);border-color:#F2CBD1;}
+  .info-list{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:7px;flex:1;min-height:0;}
+  .info-item{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);padding:8px 10px;}
+  .info-item .icon{width:15px;height:15px;color:var(--navy);}
+  .info-item span{font-size:11px;font-weight:500;line-height:1.2;}
+
+  .foot{margin-top:11px;padding-top:8px;border-top:1px solid var(--border);text-align:center;font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-secondary);flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<svg style="display:none" aria-hidden="true">
+<defs>
+  <symbol id="i-bus" viewBox="0 0 24 24">
+    <rect x="3" y="5" width="18" height="11" rx="1"/>
+    <line x1="3" y1="10" x2="21" y2="10"/>
+    <circle cx="7.5" cy="18.5" r="1.5"/>
+    <circle cx="16.5" cy="18.5" r="1.5"/>
+  </symbol>
+  <symbol id="i-map" viewBox="0 0 24 24">
+    <path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/>
+    <line x1="9" y1="4.3" x2="9" y2="18.3"/>
+    <line x1="15" y1="6" x2="15" y2="20"/>
+  </symbol>
+  <symbol id="i-ticket" viewBox="0 0 24 24">
+    <rect x="3" y="7" width="18" height="10" rx="1"/>
+    <line x1="9" y1="7" x2="9" y2="17" stroke-dasharray="2 2"/>
+  </symbol>
+  <symbol id="i-ticket-stack" viewBox="0 0 24 24">
+    <rect x="3.5" y="10" width="15" height="8" rx="1"/>
+    <rect x="6.5" y="6" width="15" height="8" rx="1"/>
+    <line x1="12.5" y1="6" x2="12.5" y2="14" stroke-dasharray="2 2"/>
+  </symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24">
+    <rect x="4" y="5" width="16" height="15" rx="1"/>
+    <line x1="4" y1="9" x2="20" y2="9"/>
+    <line x1="8" y1="3" x2="8" y2="7"/>
+    <line x1="16" y1="3" x2="16" y2="7"/>
+  </symbol>
+  <symbol id="i-info" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9"/>
+    <line x1="12" y1="11" x2="12" y2="16"/>
+    <circle cx="12" cy="8" r="1" fill="currentColor" stroke="none"/>
+  </symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9"/>
+    <line x1="12" y1="12" x2="12" y2="7"/>
+    <line x1="12" y1="12" x2="16" y2="14"/>
+  </symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24">
+    <path d="M12 21s7-7.2 7-12a7 7 0 1 0-14 0c0 4.8 7 12 7 12z"/>
+    <circle cx="12" cy="9" r="2.3"/>
+  </symbol>
+  <symbol id="i-route" viewBox="0 0 24 24">
+    <circle cx="4.5" cy="18" r="1.4" fill="currentColor" stroke="none"/>
+    <circle cx="19.5" cy="6" r="1.4" fill="currentColor" stroke="none"/>
+    <path d="M4.5 18C9 10 8 8 12 8s3 6 7.5-2" stroke-dasharray="2.4 2.4"/>
+  </symbol>
+  <symbol id="i-transfer" viewBox="0 0 24 24">
+    <path d="M4 8h14"/>
+    <path d="M15 4l3 4-3 4"/>
+    <path d="M20 16H6"/>
+    <path d="M9 12l-3 4 3 4"/>
+  </symbol>
+  <symbol id="i-cap" viewBox="0 0 24 24">
+    <path d="M12 4L2 8l10 4 10-4z"/>
+    <path d="M6 10.5V15c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5"/>
+  </symbol>
+  <symbol id="i-person" viewBox="0 0 24 24">
+    <circle cx="12" cy="7" r="3"/>
+    <path d="M5.5 20c0-4 3-6 6.5-6s6.5 2 6.5 6"/>
+  </symbol>
+  <symbol id="i-senior" viewBox="0 0 24 24">
+    <circle cx="12" cy="7" r="3"/>
+    <path d="M5.5 20c0-4 3-6 6.5-6s6.5 2 6.5 6"/>
+    <line x1="17.5" y1="14" x2="19.5" y2="20"/>
+  </symbol>
+  <symbol id="i-family" viewBox="0 0 24 24">
+    <circle cx="9" cy="7" r="2.6"/>
+    <path d="M4 20c0-3.6 2.2-5.4 5-5.4s5 1.8 5 5.4"/>
+    <circle cx="17" cy="9.5" r="1.9"/>
+    <path d="M13.2 20c0-2.7 1.7-4 3.8-4s3.8 1.3 3.8 4"/>
+  </symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24">
+    <path d="M12 20s-7.2-4.4-7.2-9.6C4.8 7 6.9 5 9.4 5c1.4 0 2.4.8 2.9 1.6.5-.8 1.5-1.6 2.9-1.6 2.5 0 4.6 2 4.6 5.4C19.8 15.6 12 20 12 20z"/>
+  </symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24">
+    <line x1="4" y1="12" x2="19" y2="12"/>
+    <path d="M14 7l5 5-5 5"/>
+  </symbol>
+  <symbol id="i-school" viewBox="0 0 24 24">
+    <path d="M4 20V9l8-5 8 5v11"/>
+    <line x1="9" y1="20" x2="9" y2="14"/>
+    <line x1="15" y1="20" x2="15" y2="14"/>
+    <line x1="3" y1="20" x2="21" y2="20"/>
+  </symbol>
+  <symbol id="i-wheelchair" viewBox="0 0 24 24">
+    <circle cx="11" cy="4.5" r="2"/>
+    <path d="M11 6.5V13h5l2 6"/>
+    <path d="M13.5 16A4.5 4.5 0 1 1 8 13"/>
+  </symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24">
+    <rect x="7" y="2.5" width="10" height="19" rx="2"/>
+    <line x1="10.5" y1="18.5" x2="13.5" y2="18.5"/>
+  </symbol>
+  <symbol id="i-tad" viewBox="0 0 24 24">
+    <rect x="6" y="2.5" width="12" height="19" rx="2"/>
+    <circle cx="9.5" cy="9" r="1" fill="currentColor" stroke="none"/>
+    <circle cx="14.5" cy="15" r="1" fill="currentColor" stroke="none"/>
+    <path d="M9.5 9c0 3 5 3 5 6" stroke-dasharray="2 2"/>
+  </symbol>
+  <symbol id="i-network" viewBox="0 0 24 24">
+    <circle cx="12" cy="5" r="2"/>
+    <circle cx="5" cy="18" r="2"/>
+    <circle cx="19" cy="18" r="2"/>
+    <line x1="12" y1="7" x2="5.8" y2="16.2"/>
+    <line x1="12" y1="7" x2="18.2" y2="16.2"/>
+    <line x1="7" y1="18" x2="17" y2="18"/>
+  </symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24">
+    <path d="M6 16v-5a6 6 0 1 1 12 0v5l1.5 2.5H4.5z"/>
+    <path d="M10 21h4"/>
+  </symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24">
+    <path d="M12 4l9 16H3z"/>
+    <line x1="12" y1="10" x2="12" y2="14.5"/>
+    <circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/>
+  </symbol>
+  <symbol id="i-store" viewBox="0 0 24 24">
+    <path d="M4 9l1.5-5h13L20 9"/>
+    <path d="M4 9v11h16V9"/>
+    <path d="M9 20v-6h6v6"/>
+  </symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24">
+    <rect x="3" y="5" width="18" height="14" rx="1"/>
+    <path d="M3.5 6l8.5 7 8.5-7"/>
+  </symbol>
+  <symbol id="i-news" viewBox="0 0 24 24">
+    <rect x="4" y="5" width="16" height="14" rx="1"/>
+    <line x1="7" y1="9" x2="17" y2="9"/>
+    <line x1="7" y1="12" x2="17" y2="12"/>
+    <line x1="7" y1="15" x2="13" y2="15"/>
+  </symbol>
+  <symbol id="i-euro" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9"/>
+    <path d="M15.2 9.2A4 4 0 1 0 15 14.8"/>
+    <line x1="8.5" y1="11" x2="13" y2="11"/>
+    <line x1="8.5" y1="13" x2="13" y2="13"/>
+  </symbol>
+  <symbol id="i-search" viewBox="0 0 24 24">
+    <circle cx="10.5" cy="10.5" r="6"/>
+    <line x1="15" y1="15" x2="20.5" y2="20.5"/>
+  </symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24">
+    <line x1="6" y1="3" x2="6" y2="21"/>
+    <path d="M6 4h12l-3 4 3 4H6"/>
+  </symbol>
+</defs>
+</svg>
+
+<div class="stage">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="kicker">Oise Mobilité • Guide voyageurs</div>
+      <h1>Horaires et tarifs Oise Mobilité</h1>
+      <p>Guide complet pour se déplacer dans l’Oise</p>
+    </div>
+    <div class="parcours" aria-label="Parcours voyageur">
+      <div class="pstep"><span class="n">01</span><span class="t">Choisir son transport</span></div>
+      <div class="pstep"><span class="n">02</span><span class="t">Consulter les horaires</span></div>
+      <div class="pstep"><span class="n">03</span><span class="t">Vérifier le tarif</span></div>
+      <div class="pstep"><span class="n">04</span><span class="t">Planifier son trajet</span></div>
+    </div>
+  </header>
+
+  <div class="board">
+
+    <!-- ROW 1 : 1 · 2 · 3 -->
+    <div class="brow r1">
+
+      <section class="panel deplacer">
+        <div class="panel-head">
+          <span class="num">1</span>
+          <svg class="icon"><use href="#i-bus"/></svg>
+          <h2>Se déplacer</h2>
+          <span class="q">Quels services utiliser ?</span>
+        </div>
+        <div class="panel-body">
+          <div class="svc4">
+            <div class="sc"><svg class="icon"><use href="#i-bus"/></svg><h3>BUS RÉGULIERS</h3><p>Lignes et réseaux de bus</p></div>
+            <div class="sc"><svg class="icon"><use href="#i-school"/></svg><h3>TRANSPORT SCOLAIRE</h3><p>Services pour les élèves</p></div>
+            <div class="sc"><svg class="icon"><use href="#i-tad"/></svg><h3>TRANSPORT À LA DEMANDE</h3><p>TAD et réservation</p></div>
+            <div class="sc"><svg class="icon"><use href="#i-network"/></svg><h3>RÉSEAUX LOCAUX</h3><p>Services de mobilité locaux</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel horaires">
+        <div class="panel-head">
+          <span class="num">2</span>
+          <svg class="icon"><use href="#i-clock"/></svg>
+          <h2>Horaires</h2>
+          <span class="q">Quand partir ?</span>
+        </div>
+        <div class="panel-body">
+          <div class="h-list">
+            <div class="h-item"><svg class="icon"><use href="#i-network"/></svg><span>Horaires par réseau</span></div>
+            <div class="h-item"><svg class="icon"><use href="#i-route"/></svg><span>Horaires par ligne</span></div>
+            <div class="h-item"><svg class="icon"><use href="#i-stop"/></svg><span>Horaires par arrêt</span></div>
+            <div class="h-item"><svg class="icon"><use href="#i-calendar"/></svg><span>Horaires selon les jours</span></div>
+            <div class="h-item"><svg class="icon"><use href="#i-alert"/></svg><span>Perturbations et changements</span></div>
+          </div>
+          <div class="mini-flow">
+            <span class="mf">Ligne</span>
+            <svg class="icon ar"><use href="#i-arrow"/></svg>
+            <span class="mf">Arrêt</span>
+            <svg class="icon ar"><use href="#i-arrow"/></svg>
+            <span class="mf">Heure</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel tarifs">
+        <div class="panel-head">
+          <span class="num">3</span>
+          <svg class="icon"><use href="#i-ticket"/></svg>
+          <h2>Tarifs</h2>
+          <span class="q">Combien coûte le trajet ?</span>
+        </div>
+        <div class="panel-body">
+          <div class="tarifs-cols">
+            <div class="tcol">
+              <div class="g-label">Billets &amp; abonnements</div>
+              <div class="fare"><svg class="icon"><use href="#i-ticket"/></svg><div><h4>TICKET UNITÉ</h4><p>Pour un trajet</p></div></div>
+              <div class="fare"><svg class="icon"><use href="#i-ticket-stack"/></svg><div><h4>CARNET DE TICKETS</h4><p>Pour plusieurs trajets</p></div></div>
+              <div class="fare"><svg class="icon"><use href="#i-calendar"/></svg><div><h4>ABONNEMENTS</h4><p>Pour voyager régulièrement</p></div></div>
+            </div>
+            <div class="tcol">
+              <div class="g-label">Tarifs spécifiques</div>
+              <div class="chips">
+                <div class="chip acc"><svg class="icon"><use href="#i-cap"/></svg><span>Jeune / Étudiant</span></div>
+                <div class="chip acc"><svg class="icon"><use href="#i-person"/></svg><span>Enfant</span></div>
+                <div class="chip acc"><svg class="icon"><use href="#i-senior"/></svg><span>Senior</span></div>
+                <div class="chip acc"><svg class="icon"><use href="#i-family"/></svg><span>Famille</span></div>
+                <div class="chip acc"><svg class="icon"><use href="#i-heart"/></svg><span>Tarif solidaire</span></div>
+              </div>
+              <div class="g-label" style="margin-top:4px;">Moyens d’achat</div>
+              <div class="chips">
+                <div class="chip"><svg class="icon"><use href="#i-ticket"/></svg><span>À bord</span></div>
+                <div class="chip"><svg class="icon"><use href="#i-euro"/></svg><span>E-boutique</span></div>
+                <div class="chip"><svg class="icon"><use href="#i-tad"/></svg><span>Ticket SMS</span></div>
+                <div class="chip"><svg class="icon"><use href="#i-phone"/></svg><span>Application</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="note"><svg class="icon"><use href="#i-info"/></svg>Les tarifs peuvent varier selon le réseau ou le service.</div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ROW 2 : 4 -->
+    <div class="brow r2">
+      <section class="panel">
+        <div class="panel-head">
+          <span class="num">4</span>
+          <svg class="icon"><use href="#i-route"/></svg>
+          <h2>Itinéraires &amp; arrêts</h2>
+          <span class="q">Comment aller de A à B ?</span>
+        </div>
+        <div class="panel-body">
+          <div class="itin-body">
+            <div class="journey-diagram">
+              <div class="jd-step"><div class="ic"><svg class="icon"><use href="#i-stop"/></svg></div><div class="lbl">Départ</div></div>
+              <svg class="icon jd-arrow"><use href="#i-arrow"/></svg>
+              <div class="jd-step"><div class="ic"><svg class="icon"><use href="#i-stop"/></svg></div><div class="lbl">Arrêt</div></div>
+              <svg class="icon jd-arrow"><use href="#i-arrow"/></svg>
+              <div class="jd-step"><div class="ic"><svg class="icon"><use href="#i-bus"/></svg></div><div class="lbl">Ligne / Service</div></div>
+              <svg class="icon jd-arrow"><use href="#i-arrow"/></svg>
+              <div class="jd-step"><div class="ic"><svg class="icon"><use href="#i-transfer"/></svg></div><div class="lbl">Correspondance</div></div>
+              <svg class="icon jd-arrow"><use href="#i-arrow"/></svg>
+              <div class="jd-step"><div class="ic"><svg class="icon"><use href="#i-flag"/></svg></div><div class="lbl">Destination</div></div>
+            </div>
+            <div class="chips5">
+              <div class="mc"><svg class="icon"><use href="#i-search"/></svg><span>Recherche d’itinéraire</span></div>
+              <div class="mc"><svg class="icon"><use href="#i-stop"/></svg><span>Trouver un arrêt</span></div>
+              <div class="mc"><svg class="icon"><use href="#i-map"/></svg><span>Carte du réseau</span></div>
+              <div class="mc"><svg class="icon"><use href="#i-transfer"/></svg><span>Correspondances</span></div>
+              <div class="mc"><svg class="icon"><use href="#i-route"/></svg><span>Départ et destination</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ROW 3 : 5 · 6 -->
+    <div class="brow r3">
+
+      <section class="panel" style="flex:1;">
+        <div class="panel-head">
+          <span class="num">5</span>
+          <svg class="icon"><use href="#i-person"/></svg>
+          <h2>Services &amp; besoins spécifiques</h2>
+          <span class="q">Quels services correspondent à mon besoin ?</span>
+        </div>
+        <div class="panel-body">
+          <div class="svc-list">
+            <div class="svc"><svg class="icon"><use href="#i-school"/></svg><span class="t">Transport scolaire</span><span class="tag service">Service</span></div>
+            <div class="svc"><svg class="icon"><use href="#i-wheelchair"/></svg><span class="t">Mobilité réduite / PMR</span><span class="tag service">Service</span></div>
+            <div class="svc"><svg class="icon"><use href="#i-cap"/></svg><span class="t">Jeunes / étudiants</span><span class="tag cat">Catégorie</span></div>
+            <div class="svc"><svg class="icon"><use href="#i-senior"/></svg><span class="t">Seniors</span><span class="tag cat">Catégorie</span></div>
+            <div class="svc"><svg class="icon"><use href="#i-euro"/></svg><span class="t">Tarifs spécifiques</span><span class="tag cat">Catégorie</span></div>
+          </div>
+          <div class="note"><svg class="icon"><use href="#i-info"/></svg>Transport scolaire = service ; tarifs spécifiques = catégories de voyageurs.</div>
+        </div>
+      </section>
+
+      <section class="panel" style="flex:1;">
+        <div class="panel-head">
+          <span class="num">6</span>
+          <svg class="icon"><use href="#i-info"/></svg>
+          <h2>Informations pratiques</h2>
+          <span class="q">Comment utiliser le réseau ?</span>
+        </div>
+        <div class="panel-body">
+          <div class="info-list">
+            <div class="info-item"><svg class="icon"><use href="#i-phone"/></svg><span>Application Oise Mobilité</span></div>
+            <div class="info-item"><svg class="icon"><use href="#i-tad"/></svg><span>Réservation</span></div>
+            <div class="info-item"><svg class="icon"><use href="#i-bell"/></svg><span>Alertes trafic</span></div>
+            <div class="info-item"><svg class="icon"><use href="#i-store"/></svg><span>Points de vente</span></div>
+            <div class="info-item"><svg class="icon"><use href="#i-mail"/></svg><span>Contact</span></div>
+            <div class="info-item"><svg class="icon"><use href="#i-news"/></svg><span>Actualités et perturbations</span></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+
+  <footer class="foot">Sources officielles &bull; Horaires &bull; Tarifs &bull; Services &bull; Informations voyageurs</footer>
+
+</div>
+
+<script>
+  (function(){
+    var stage = document.querySelector('.stage');
+    function fit(){
+      var s = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+      stage.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+    }
+    window.addEventListener('resize', fit);
+    window.addEventListener('orientationchange', fit);
+    fit();
+  })();
+</script>
+</body>
+</html>

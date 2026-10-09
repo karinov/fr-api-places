@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>France Retail Places Extractor - High Density Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,600;1,6..72,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#E4E3E0] text-[#141414] antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      (function () {
+        function showFallback() {
+          var root = document.getElementById('root');
+          if (!root || root.childElementCount > 0) return;
+          var url = new URL(window.location.href);
+          if (!url.searchParams.has('_r')) {
+            url.searchParams.set('_r', Date.now().toString());
+            window.location.replace(url.toString());
+            return;
+          }
+          root.innerHTML =
+            '<div style="font-family:monospace;padding:24px;background:#E4E3E0;color:#141414;min-height:100vh;box-sizing:border-box">' +
+            '<h2 style="margin:0 0 8px">Gagal memuat aplikasi</h2>' +
+            '<p style="margin:0 0 12px">Aset website mungkin masih versi cache lama. Klik reload untuk memuat ulang.</p>' +
+            '<button onclick="window.location.href=window.location.pathname" style="padding:8px 12px;border:1px solid #141414;background:#141414;color:#fff;cursor:pointer">Reload</button>' +
+            '</div>';
+        }
+        window.addEventListener('load', function () {
+          setTimeout(showFallback, 6000);
+        });
+      })();
+    </script>
+  </body>
+</html>
+

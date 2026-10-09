@@ -1,0 +1,6 @@
+{
+  "name": "France Retail Places Extractor",
+  "description": "App untuk pull data Google Places API retail chains utama di kota-kota besar Prancis & simpan dalam file JSON.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
